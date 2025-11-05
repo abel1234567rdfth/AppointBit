@@ -61,7 +61,8 @@ const RenderField = ({ field, props }: { field: any; props: CustomProps }) => {
             placeholder={placeholder}
             defaultCountry="ET"
             international
-            {...field}
+            value={field.value}
+            onChange={field.onChange}
             className="input-phone"
           />
         </FormControl>
