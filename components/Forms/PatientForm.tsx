@@ -48,10 +48,28 @@ export function PatientForm() {
           control={form.control}
           fieldType={FormFieldType.INPUT}
           name="name"
-          label="Full name"
+          label="Full Name"
           iconSrc="/assets/icons/user.svg"
           iconAlt="user"
           placeholder="Name"
+        />
+
+        <CustomFormField
+          control={form.control}
+          fieldType={FormFieldType.INPUT}
+          name="email"
+          label="Email"
+          iconSrc="/assets/icons/email.svg"
+          iconAlt="email"
+          placeholder="Email"
+        />
+
+        <CustomFormField
+          control={form.control}
+          fieldType={FormFieldType.PHONE_INPUT}
+          name="phone"
+          label="Phone Number"
+          placeholder="Phone No"
         />
 
         <Button type="submit">Submit</Button>
