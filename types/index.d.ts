@@ -55,3 +55,4 @@ declare type UpdateAppointmentParams = {
   type: string;
 };
 // finished after pasting index.d.ts
+// 1:15:46
