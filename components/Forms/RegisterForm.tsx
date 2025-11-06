@@ -1,4 +1,3 @@
-"use client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -9,18 +8,9 @@ import SubmitButton from "../ui/SubmitButton";
 import { useState } from "react";
 import { UserformValidation } from "@/lib/validation";
 import { useRouter } from "next/navigation";
+import { FormFieldType } from "./PatientForm";
 
-export enum FormFieldType {
-  INPUT = "input",
-  TEXTAREA = "textarea",
-  PHONE_INPUT = "phoneInput",
-  CHECKBOX = "checkbox",
-  DATE_PICKER = "datePicker",
-  SELECT = "select",
-  SKELETON = "skeleton",
-}
-
-export function RegisterForm() {
+export async function RegisterForm({ user }: { user: User }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -76,23 +66,6 @@ export function RegisterForm() {
           placeholder="Name"
         />
 
-        <CustomFormField
-          control={form.control}
-          fieldType={FormFieldType.INPUT}
-          name="email"
-          label="Email"
-          iconSrc="/assets/icons/email.svg"
-          iconAlt="email"
-          placeholder="Email"
-        />
-
-        <CustomFormField
-          control={form.control}
-          fieldType={FormFieldType.PHONE_INPUT}
-          name="phone"
-          label="Phone Number"
-          placeholder="Phone No"
-        />
         <SubmitButton isLoading={isLoading}>Get Started</SubmitButton>
       </form>
     </Form>
@@ -100,3 +73,5 @@ export function RegisterForm() {
 }
 
 export default RegisterForm;
+
+//
