@@ -7,7 +7,7 @@ import { Form } from "@/components/ui/form";
 import CustomFormField from "../ui/CustomFormField";
 import SubmitButton from "../ui/SubmitButton";
 import { useState } from "react";
-import { UserformValidation } from "@/lib/validation";
+import { UserFormValidation } from "@/lib/validation";
 import { useRouter } from "next/navigation";
 
 export enum FormFieldType {
@@ -25,8 +25,8 @@ export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof UserformValidation>>({
-    resolver: zodResolver(UserformValidation),
+  const form = useForm<z.infer<typeof UserFormValidation>>({
+    resolver: zodResolver(UserFormValidation),
     defaultValues: {
       name: "",
       email: "",
@@ -39,7 +39,7 @@ export function RegisterForm() {
     name,
     email,
     phone,
-  }: z.infer<typeof UserformValidation>) {
+  }: z.infer<typeof UserFormValidation>) {
     setIsLoading(true);
 
     try {

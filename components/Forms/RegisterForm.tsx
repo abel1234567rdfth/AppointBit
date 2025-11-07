@@ -1,54 +1,86 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Resolver, useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
+
 import { Form, FormControl } from "@/components/ui/form";
 import CustomFormField from "../ui/CustomFormField";
 import SubmitButton from "../ui/SubmitButton";
 import { useState } from "react";
-import { UserformValidation } from "@/lib/validation";
+import { CustomerFormValidation } from "@/lib/validation";
 import { useRouter } from "next/navigation";
 import { FormFieldType } from "./PatientForm";
 
-import { Agents, GenderOptions } from "@/constants";
+import {
+  Agents,
+  CustomerFormDefaultValues,
+  GenderOptions,
+  IdentificationTypes,
+} from "@/constants";
 import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { SelectItem } from "../ui/select";
 import Image from "next/image";
+import FileUploader from "../ui/FileUploader";
 
 export function RegisterForm({ user }: { user: User }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof UserformValidation>>({
-    resolver: zodResolver(UserformValidation),
+  type CustomerFormType = z.infer<typeof CustomerFormValidation>;
+
+  const form = useForm<CustomerFormType>({
+    resolver: zodResolver(CustomerFormValidation) as Resolver<CustomerFormType>,
     defaultValues: {
+      ...CustomerFormDefaultValues,
       name: "",
       email: "",
       phone: "",
     },
   });
+  console.log("FORM ERRORS", form.formState.errors);
 
   // 2. Define a submit handler.
-  async function onSubmit({
-    name,
-    email,
-    phone,
-  }: z.infer<typeof UserformValidation>) {
+  async function onSubmit(values: z.infer<typeof CustomerFormValidation>) {
+    console.log("Form submitted values:", values);
     setIsLoading(true);
 
     try {
-      const res = await fetch("/api/actions/customeractions/create-user", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email }),
-      });
-      const user = await res.json();
+      const formData = new FormData();
 
-      if (user) {
-        router.push(`/patients/${user.$id}/register`);
+      // Append all normal fields except the file
+      Object.entries(values).forEach(([key, value]) => {
+        if (key === "birthDate") {
+          formData.append(key, new Date(value as string).toISOString());
+        } else if (key !== "identificationDocument") {
+          formData.append(key, value as string);
+        }
+      });
+
+      if (values.identificationDocument?.length) {
+        formData.append(
+          "identificationDocument",
+          values.identificationDocument[0]
+        );
+      }
+
+      // Append userId
+      formData.append("userId", user.$id);
+
+      // Fetch request
+      const res = await fetch(
+        "/api/actions/customeractions/register-customer",
+        {
+          method: "POST",
+          body: formData, // ✅ send FormData directly
+        }
+      );
+
+      const customer = await res.json();
+
+      if (customer) {
+        router.push(`/patients/${user.$id}/new-appointment`);
       }
     } catch (error) {
       console.log(error);
@@ -56,6 +88,7 @@ export function RegisterForm({ user }: { user: User }) {
       setIsLoading(false);
     }
   }
+
   return (
     <Form {...form}>
       <form
@@ -147,7 +180,7 @@ export function RegisterForm({ user }: { user: User }) {
 
           <CustomFormField
             control={form.control}
-            fieldType={FormFieldType.PHONE_INPUT}
+            fieldType={FormFieldType.INPUT}
             name="occupation"
             label="Ocupation"
             placeholder="Occupation"
@@ -209,7 +242,7 @@ export function RegisterForm({ user }: { user: User }) {
 
           <CustomFormField
             control={form.control}
-            fieldType={FormFieldType.PHONE_INPUT}
+            fieldType={FormFieldType.INPUT}
             name="insurancePolicyNumber"
             label="Insurance Policy Number"
             placeholder="Enter Insurance Policy Number"
@@ -237,7 +270,7 @@ export function RegisterForm({ user }: { user: User }) {
             control={form.control}
             fieldType={FormFieldType.TEXTAREA}
             name="familyMedicalHistory"
-            label="family Medical History"
+            label="Family Medical History"
             placeholder="Any Family Medical Issues"
           />
 
@@ -249,12 +282,76 @@ export function RegisterForm({ user }: { user: User }) {
             placeholder="Any Previous Medical Issue "
           />
         </div>
-        <div className="flex flex-col gap-6 xl:flex-row"></div>
-        <div className="flex flex-col gap-6 xl:flex-row"></div>
-        <div className="flex flex-col gap-6 xl:flex-row"></div>
-        <div className="flex flex-col gap-6 xl:flex-row"></div>
+        <section className="mb-12 space-y-6">
+          <div className="mb-9">
+            <h2 className="sub-header">Identification and Verification</h2>
+          </div>
+        </section>
+        <CustomFormField
+          control={form.control}
+          fieldType={FormFieldType.SELECT}
+          name="identificationType"
+          label="Identification Type"
+          placeholder="Select an Identification Type"
+        >
+          {IdentificationTypes.map((type) => (
+            <SelectItem key={type} value={type}>
+              {type}
+            </SelectItem>
+          ))}
+        </CustomFormField>
 
-        <div className="flex flex-col gap-6 xl:flex-row"></div>
+        <CustomFormField
+          control={form.control}
+          fieldType={FormFieldType.INPUT}
+          name="identificationNumber"
+          label="Identification Number"
+          placeholder="Enter Identification Number"
+        />
+        <CustomFormField
+          control={form.control}
+          fieldType={FormFieldType.SKELETON}
+          name="identificationDocument"
+          label="Identification Document"
+          placeholder="Scanned Copy of Identification Document"
+          renderSkeleton={(field) => (
+            <FormControl>
+              <FileUploader
+                onchange={(files) => {
+                  console.log("FileUploader changed:", files);
+                  field.onChange(files);
+                }}
+                files={field.value}
+              />
+            </FormControl>
+          )}
+        />
+
+        <section className="mb-12 space-y-6">
+          <div className="mb-9">
+            <h2 className="sub-header">Consent and Privacy</h2>
+          </div>
+        </section>
+
+        <CustomFormField
+          fieldType={FormFieldType.CHECKBOX}
+          control={form.control}
+          name="disclosureConsent"
+          label="I consent to disclosure of information"
+        />
+        <CustomFormField
+          fieldType={FormFieldType.CHECKBOX}
+          control={form.control}
+          name="appointmentConsent"
+          label="I consent to the appointment"
+        />
+
+        <CustomFormField
+          fieldType={FormFieldType.CHECKBOX}
+          control={form.control}
+          name="privacyConsent"
+          label="I consent to privacy policy"
+        />
 
         <SubmitButton isLoading={isLoading}>Get Started</SubmitButton>
       </form>
@@ -263,7 +360,3 @@ export function RegisterForm({ user }: { user: User }) {
 }
 
 export default RegisterForm;
-
-//appwrite permission and fetch request   fixed
-// user registered and fetched for use register section 1 form done
-// 1:45:39

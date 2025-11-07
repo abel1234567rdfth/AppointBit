@@ -1,30 +1,34 @@
+import { CustomerFormValidation } from "@/lib/validation";
+import z from "zod";
+
 export const GenderOptions = ["Male", "Female"];
 
-export const PatientFormDefaultValues = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  birthDate: new Date(Date.now()),
-  gender: "Male" as Gender,
-  address: "",
-  occupation: "",
-  emergencyContactName: "",
-  emergencyContactNumber: "",
-  primaryPhysician: "",
-  insuranceProvider: "",
-  insurancePolicyNumber: "",
-  allergies: "",
-  currentMedication: "",
-  familyMedicalHistory: "",
-  pastMedicalHistory: "",
-  identificationType: "Birth Certificate",
-  identificationNumber: "",
-  identificationDocument: [],
-  treatmentConsent: false,
-  disclosureConsent: false,
-  privacyConsent: false,
-};
+export const CustomerFormDefaultValues: z.infer<typeof CustomerFormValidation> =
+  {
+    name: "",
+    email: "",
+    phone: "",
+    birthDate: new Date(),
+    gender: "Male",
+    address: "",
+    occupation: "",
+    emergencyContactName: "",
+    emergencyContactNumber: "",
+    primaryAgent: "",
+    insuranceProvider: "",
+    insurancePolicyNumber: "",
+    allergies: "",
+    currentMedication: "",
+    familyMedicalHistory: "",
+    pastMedicalHistory: "",
+    identificationType: "",
+    identificationNumber: "",
+    identificationDocument: [], //
+
+    disclosureConsent: false,
+    appointmentConsent: false,
+    privacyConsent: false,
+  };
 
 export const IdentificationTypes = [
   "Birth Certificate",

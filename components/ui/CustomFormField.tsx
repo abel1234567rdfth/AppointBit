@@ -27,13 +27,14 @@ import Image from "next/image";
 import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { Textarea } from "./textarea";
+import { Checkbox } from "./checkbox";
 
 interface CustomProps {
   control: Control<any>;
   fieldType: FormFieldType;
   name: string;
   label?: string;
-  placeholder: string;
+  placeholder?: string;
   iconSrc?: string;
   iconAlt?: string;
   disabled?: boolean;
@@ -52,6 +53,7 @@ const RenderField = ({ field, props }: { field: any; props: CustomProps }) => {
     dateFormat,
     renderSkeleton,
   } = props;
+
   switch (fieldType) {
     case FormFieldType.INPUT:
       return (
@@ -98,6 +100,22 @@ const RenderField = ({ field, props }: { field: any; props: CustomProps }) => {
           />
         </FormControl>
       );
+    case FormFieldType.CHECKBOX:
+      return (
+        <FormControl>
+          <div className="flex items-center gap-4">
+            <Checkbox
+              id={props.name}
+              checked={!!field.value}
+              onCheckedChange={(checked) => field.onChange(!!checked)}
+            />
+            <label htmlFor={props.name} className="checkbox-label">
+              {props.label}
+            </label>
+          </div>
+        </FormControl>
+      );
+
     case FormFieldType.DATE_PICKER:
       return (
         <div className="rounded-md border-dark-500 bg-dark-400 flex">
