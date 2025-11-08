@@ -1,13 +1,22 @@
 import PatientForm from "@/components/Forms/PatientForm";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
+import PasskeyModal from "@/components/ui/PasskeyModal";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function Home() {
+interface adminvalueprop {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default async function Home(params: adminvalueprop) {
+  const searchParamsObj = params.searchParams ? await params.searchParams : {};
+  const isadmin = searchParamsObj.admin === "true";
+
+  console.log(isadmin);
   return (
     <div className="flex h-screen max-h-screen">
-      {/* TODO:OTP Verification | PassKeyModal */}
+      {isadmin && <PasskeyModal />}
 
       <section className="remove-scrollbar container my-auto">
         <div className="sub-container max-w-[496px]">

@@ -13,7 +13,7 @@ const Register = async ({ params }: RegisterPageProps) => {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/actions/customeractions/get-user?userId=${userId}`,
     {
-      cache: "no-store", // optional, ensures fresh data
+      cache: "no-store", // ensures fresh data
     }
   );
   const user = await res.json();
