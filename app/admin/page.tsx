@@ -1,27 +1,65 @@
+"use client"; // <- this makes the whole page a client component
+
 import { columns } from "../../components/table/columns";
 import { DataTable } from "@/components/table/data-table";
 import StatCard from "@/components/ui/StatCard";
-import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-const Admin = async () => {
-  const res = await fetch(
-    `/api/actions/appointmentactions/get-appointmentList`
-  );
-  const appointments = await res.json();
+interface AppointmentCounts {
+  scheduledCount: number;
+  pendingCount: number;
+  cancelledCount: number;
+  documents: any[];
+}
+
+const Admin = () => {
+  const [appointments, setAppointments] = useState<AppointmentCounts>({
+    scheduledCount: 0,
+    pendingCount: 0,
+    cancelledCount: 0,
+    documents: [],
+  });
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const res = await fetch(
+          "/api/actions/appointmentactions/get-appointmentList"
+        );
+        const data = await res.json();
+        setAppointments(data);
+      } catch (error) {
+        console.error("Failed to fetch appointments:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-7xl text-center py-20">
+        Loading dashboard...
+      </div>
+    );
+  }
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col space-y-14 ">
+    <div className="mx-auto flex max-w-7xl flex-col space-y-14">
       <header className="admin-header">
         <Link href={"/"}>
           <h1 className="text-36-bold mb-2 text-center">
-            <span className="text-purple-500">Appoint</span>
-            Bit
+            <span className="text-purple-500">Appoint</span>Bit
           </h1>
         </Link>
         <p className="text-16-semibold">Admin Dashboard</p>
       </header>
+
       <main className="admin-main">
         <section className="w-full space-y-4">
           <h1 className="header">Welcome 👋</h1>
